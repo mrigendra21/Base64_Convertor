@@ -189,3 +189,4 @@ for b in range(0, len(absolutebin), 6):
     basesix4 = base64(temp_Data)
     encoded = encoded + basesix4
 print(encoded)
+
