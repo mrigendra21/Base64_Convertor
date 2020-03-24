@@ -1,0 +1,4865 @@
+Building configuration...
+
+Current configuration : 134480 bytes
+!
+! Last configuration change at 14:59:23 IST Thu Mar 19 2020 by mcxnoc
+! NVRAM config last updated at 00:26:20 IST Wed Mar 18 2020 by mcxnoc
+!
+version 16.6
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+no service dhcp
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+platform punt-intf rate 500
+!
+hostname DC-TN-P2P-ASR-R1
+!
+boot-start-marker
+boot system bootflash:asr1000rpx86-universalk9.16.06.02.SPA.bin
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+security passwords min-length 8
+logging buffered 16384
+logging console informational
+enable secret 5 <removed>
+!
+no aaa new-model
+process cpu threshold type total rising 80 interval 5 falling 20 interval 5
+clock timezone IST 5 30
+no ip source-route
+!
+!
+!
+!
+!
+!
+!
+no ip bootp server
+no ip domain lookup
+ip domain name mcx.in
+ip multicast-routing distributed
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+key chain P2PCHAIN
+ key 2
+  key-string 7 <removed>
+!
+!
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-237272412
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-237272412
+ revocation-check none
+ rsakeypair TP-self-signed-237272412
+!
+!
+crypto pki certificate chain TP-self-signed-237272412
+!
+!
+license udi pid ASR1009-X sn FXS210801X4
+license boot level advipservices
+spanning-tree extend system-id
+diagnostic bootup level minimal
+!
+!
+!
+username admin privilege 15 secret 5 <removed>
+username mcxnoc privilege 15 secret 5 <removed>
+!
+redundancy
+ mode sso
+bfd-template single-hop BFD_BGP
+ interval min-tx 500 min-rx 500 multiplier 3
+!
+!
+!
+!
+!
+!
+!
+!
+policy-map 40MBPS_MEMBER_IN
+ class class-default
+  police 40000000
+policy-map 48MBPS_MEMBER_OUT
+ class class-default
+  shape average 48000000   
+policy-map 45MBPS_MEMBER_IN
+ class class-default
+  police 45000000
+policy-map 20MBPS_MEMBER_IN
+ class class-default
+  police 20000000
+policy-map 100MBPS_MEMBER_IN
+ class class-default
+  police 100000000
+policy-map 20MBPS_MEMBER_OUT
+ class class-default
+  shape average 20000000   
+policy-map 10MBPS_MEMBER_IN
+ class class-default
+  police 10000000
+policy-map 10MBPS_MEMBER_OUT
+ class class-default
+  shape average 10000000   
+policy-map 2MBPS_MEMBER_IN
+ class class-default
+  police 2000000
+policy-map 75MBPS_MEMBER_IN
+ class class-default
+  police 75000000
+policy-map 45MBPS_MEMBER_OUT
+ class class-default
+  shape average 45000000   
+policy-map 48MBPS_MEMBER_IN
+ class class-default
+  police 48000000
+policy-map 2MBPS_MEMBER_OUT
+ class class-default
+  shape average 2000000   
+policy-map 40MBPS_MEMBER_OUT
+ class class-default
+  shape average 40000000   
+policy-map 100MBPS_MEMBER_OUT
+ class class-default
+  shape average 100000000   
+policy-map 75MBPS_MEMBER_OUT
+ class class-default
+  shape average 75000000   
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback10
+ description *** P2P MEM RP Address ***
+ ip address 10.138.7.23 255.255.255.255
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Loopback100
+ description *** EIGRP 100 Router-ID ***
+ ip address 172.16.100.51 255.255.255.255
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Loopback320
+ description *** EIGRP 320 Router-ID ***
+ ip address 172.16.100.52 255.255.255.255
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet0/0/0
+ description *** Uplink to N3K-1 E1/42 ****
+ ip address 192.168.192.74 255.255.255.252
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip authentication mode eigrp 100 md5
+ ip authentication key-chain eigrp 100 P2PCHAIN
+ ip hello-interval eigrp 100 1
+ ip hold-time eigrp 100 3
+ ip pim sparse-mode
+ ip access-group LAN-IN in
+!
+interface TenGigabitEthernet0/1/0
+ description *** Uplink to N3K-2 E1/42 ****
+ ip address 192.168.192.82 255.255.255.252
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip authentication mode eigrp 100 md5
+ ip authentication key-chain eigrp 100 P2PCHAIN
+ ip hello-interval eigrp 100 1
+ ip hold-time eigrp 100 3
+ ip pim sparse-mode
+ ip access-group LAN-IN in
+!
+interface GigabitEthernet0/2/0
+ description *** TCL 10Mbps Link ***
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/0.301
+ description "PCScommoditiesPvt.Ltd_091MUMB1143029226437"_14-Oct-2017
+ bandwidth 10000
+ encapsulation dot1Q 301
+ ip address 172.16.55.89 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.304
+ description "GoyalSecurities_091MUMB1143030880968"_04-Apr-2018
+ bandwidth 10000
+ encapsulation dot1Q 304
+ ip address 172.16.56.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.305
+ description "PassionCommoditiesPVTLTD_091KANP1143033710230"_15-Jun-2019
+ bandwidth 2000
+ encapsulation dot1Q 305
+ ip address 172.16.55.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.308
+ description "PhilipCapitalIndiaLTD_091MUMB1143032280590"_22-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 308
+ ip address 172.16.51.225 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.309
+ description "IIFLSecurities_091MUMB114302098375"_ 20-Oct-2018
+ bandwidth 2000
+ encapsulation dot1Q 309
+ ip address 172.16.56.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.311
+ description "Adroit_Financial_091MUMB1143032009815"_01-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 311
+ ip address 172.16.50.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.313
+ description "SMC_091DELHI143031954645"_08-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 313
+ ip address 172.16.50.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.314
+ description "Motilal_Oswal_091MUMB1143032160313"_01-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 314
+ ip address 172.16.57.209 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.315
+ description "Estee_Advisorsprivatedltd_091MUMB1143034128214"_19-Oct-2019
+ bandwidth 100000
+ encapsulation dot1Q 315
+ ip address 172.16.52.41 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.316
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/0.318
+ description "Axis_Securities_091MUMB1143031970583"_01-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 318
+ ip address 172.16.50.161 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.320
+ description "Rksv_Securities_091MUMB11430322551153"_27-Oct-2018
+ bandwidth 2000
+ encapsulation dot1Q 320
+ ip address 172.16.57.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.321
+ description "Ray_Trading_091MUMB1143032199695"_27-Oct-2018
+ bandwidth 2000
+ encapsulation dot1Q 321
+ ip address 172.16.57.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.329
+ description "Way2Wealth_Commodties_091MUMB1143032027333"_03-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 329
+ ip address 172.16.57.105 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.334
+ description "Pinnacle_BrocomPvtLtd_091MUMB1143032610204"_17-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 334
+ ip address 172.16.57.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.335
+ description "AdityaBirlaMoney_091MUMB1143032666800"_24-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 335
+ ip address 172.16.57.169 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.336
+ description "Radarvision_091KOLK1143032823866"_04-Feb-2019
+ bandwidth 10000
+ encapsulation dot1Q 336
+ ip address 172.16.55.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.338
+ description "NyceCommodity_091MUMB1143013681206"_25-Oct-2015
+ bandwidth 10000
+ encapsulation dot1Q 338
+ ip address 172.16.51.129 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.339
+ description "Ariston_091MUMB1143032643113"_15-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 339
+ ip address 172.16.57.233 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.340
+ description "AristonCommodities_091MUMB1143032643132"_24-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 340
+ ip address 172.16.57.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.341
+ description "Ariston_091MUMB1143032643151"_15-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 341
+ ip address 172.16.57.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.342
+ description "AristonCommodities_091MUMB1143032643170"_24-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 342
+ ip address 172.16.57.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.344
+ description "AristonCommodities_091MUMB1143032643189"_24-Nov-2018
+ bandwidth 100000
+ encapsulation dot1Q 344
+ ip address 172.16.57.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.345
+ description "Ariston_091MUMB1143032643208"_15-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 345
+ ip address 172.16.57.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.346
+ description "Evermore_Commodties_091MUMB1143032647115"_17-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 346
+ ip address 172.16.57.121 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.349
+ description "Arya Tradex_091MUMB1143014093101"_13-Feb-2016
+ bandwidth 10000
+ encapsulation dot1Q 349
+ ip address 172.16.51.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.352
+ description "Aasmaa broking Pvt Ltd_091MUMB1143032380315"_17-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 352
+ ip address 172.16.57.145 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.353
+ description "Pluswealth Capital Management _091MUMB1143032689533"_17-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 353
+ ip address 172.16.57.153 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.354
+ description "Purvag Commodities_091MUMB1143014244998"_13-Feb-2016
+ bandwidth 10000
+ encapsulation dot1Q 354
+ ip address 172.16.51.217 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.355
+ description "Achintya_Commodities _ 091MUMB1143032756188"_01-Dec-2018
+ bandwidth 20000
+ encapsulation dot1Q 355
+ ip address 172.16.57.217 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 20MBPS_MEMBER_IN
+ service-policy output 20MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.356
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/0.357
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/0.358
+ description "HDFC_Securities_091MUMB1143032647339"_04-Feb-2019
+ bandwidth 10000
+ encapsulation dot1Q 358
+ ip address 172.16.52.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.359
+ description "HDFC_Securities_091MUMB1143032647358"_04-Feb-2019
+ bandwidth 10000
+ encapsulation dot1Q 359
+ ip address 172.16.53.97 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.360
+ description "Adroit Commodities_091MUMB1143033003466"_26-Jan-2019
+ bandwidth 10000
+ encapsulation dot1Q 360
+ ip address 172.16.52.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.361
+ description "ADROIT-12004790697"_26-Aug-2017
+ bandwidth 10000
+ encapsulation dot1Q 361
+ ip address 172.16.55.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.363
+ description "AryaTradex_091MUMB1143032991678"_09-Feb-2019
+ bandwidth 20000
+ encapsulation dot1Q 363
+ ip address 172.16.52.89 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 20MBPS_MEMBER_IN
+ service-policy output 20MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.364
+ description "Dharmshi Commodities_091MUMB1143015488603"_18-Jun-2016
+ bandwidth 10000
+ encapsulation dot1Q 364
+ ip address 172.16.52.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.366
+ description "Adroit Commodities_091KOLK1143032943989"_26-Jan-2019
+ bandwidth 2000
+ encapsulation dot1Q 366
+ ip address 172.16.53.65 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.368
+ description "MasterCommodityServicesLTD_091NEWD1143033100518"_02-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 368
+ ip address 172.16.50.105 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.372
+ description "MasterCommodityServicesLTD_091NEWD1143033099213"_02-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 372
+ ip address 172.16.50.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.373
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/0.381
+ description "VedikaVanijayPvtLtd_091KOLK114303292715"_10-Aug-2019
+ bandwidth 2000
+ encapsulation dot1Q 381
+ ip address 172.16.50.121 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.382
+ description "Adroitcommodity_091MUMB1143033264893"_20-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 382
+ ip address 172.16.55.121 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.383
+ description "MasterCommodity_091NAVI1143033249172"_23-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 383
+ ip address 172.16.54.169 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.398
+ description "Navia Commodities_091MUMB1143029375867"_30-Sep-2017
+ bandwidth 10000
+ encapsulation dot1Q 398
+ ip address 172.16.55.65 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/0.399
+ description "DOTEX_INTERNATIONAL_091MUMB1143018659478"_26-Aug-2017
+ bandwidth 10000
+ encapsulation dot1Q 399
+ ip address 172.16.54.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/1
+ description *** Videocon 10Mbps Link ***
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/1.511
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/1.512
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/1.522
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/1.523
+ description "Estee_690380"_26-Nov-2016
+ bandwidth 45000
+ encapsulation dot1Q 523
+ ip address 172.16.53.169 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/1.527
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/1.528
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/1.529
+ description "GRD_COMMODITIES_719743"_09-Sep-2017
+ bandwidth 10000
+ encapsulation dot1Q 529
+ ip address 172.16.53.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/1.547
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/1.553
+ description "Berkeley_Commodities_105110"_23-Jun-2018
+ bandwidth 10000
+ encapsulation dot1Q 553
+ ip address 172.16.53.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2
+ description **"Microscan_MPLS_TP_THIRD_UPLINK"***
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/2.616
+ description "Asankhya Trading_MUMSP00033"_16-Jun-2018
+ bandwidth 100000
+ encapsulation dot1Q 616
+ ip address 172.16.56.97 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2.618
+ description "Asankhya_Trading_Pvt_Ltd._MUMLS00089"_03-Aug-2019
+ bandwidth 100000
+ encapsulation dot1Q 618
+ ip address 172.16.59.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2.622
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/2.639
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/2.640
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/2.641
+ description "AsankhayTrading_MUMLS00054"_27-Oct-2018
+ bandwidth 100000
+ encapsulation dot1Q 641
+ ip address 172.16.57.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2.642
+ description "AsankhayTrading_MUMLS00056"_27-Oct-2018
+ bandwidth 100000
+ encapsulation dot1Q 642
+ ip address 172.16.57.41 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2.643
+ description "AsankhayTrading_MUMLS00057"_27-Oct-2018
+ bandwidth 100000
+ encapsulation dot1Q 643
+ ip address 172.16.57.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2.644
+ description "Angel_Broking_MUMLS00045"_29-Sep-2018
+ encapsulation dot1Q 644
+ ip address 172.16.56.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2.645
+ description "AsankhayTrading_MUMLS00058"_27-Oct-2018
+ bandwidth 100000
+ encapsulation dot1Q 645
+ ip address 172.16.57.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/2.646
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/2.647
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/2.697
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3
+ description "Microscan_MPLS_TP_First_Uplink"
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/3.607
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00013"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 607
+ ip address 172.16.54.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.608
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00014"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 608
+ ip address 172.16.54.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.609
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00015"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 609
+ ip address 172.16.54.65 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.610
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00016"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 610
+ ip address 172.16.54.73 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.611
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00017"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 611
+ ip address 172.16.54.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.617
+ description "Asankhya Trading_MUMSP00034"_16-Jun-2018
+ bandwidth 100000
+ encapsulation dot1Q 617
+ ip address 172.16.56.105 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.618
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.622
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.623
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.624
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.625
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00020"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 625
+ ip address 172.16.56.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.626
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00021"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 626
+ ip address 172.16.56.89 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.631
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00026"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 631
+ ip address 172.16.51.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.632
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00027"_01-Jan-202
+ bandwidth 45000
+ encapsulation dot1Q 632
+ ip address 172.16.51.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.633
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.634
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00029"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 634
+ ip address 172.16.51.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/3.635
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.636
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.637
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/3.638
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/4
+ description "Microscan_MPLS_TP_Second_Uplink"
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/4.601
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00007"_18-Feb-2017
+ bandwidth 100000
+ encapsulation dot1Q 601
+ ip address 172.16.54.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.602
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00008"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 602
+ ip address 172.16.54.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.603
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00009"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 603
+ ip address 172.16.54.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.604
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00010"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 604
+ ip address 172.16.54.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.605
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00011"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 605
+ ip address 172.16.54.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.606
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00012"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 606
+ ip address 172.16.54.41 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.612
+ description "Raghunandan_MUMSP00023"_22-Apr-2017
+ bandwidth 45000
+ encapsulation dot1Q 612
+ ip address 172.16.54.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.613
+ description "Raghunandan_MUMSP00025"_27-May-2017
+ bandwidth 100000
+ encapsulation dot1Q 613
+ ip address 172.16.54.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.620
+ description "Graviton_Research_Captial_MUMLS00018"-10-Mar-2018
+ bandwidth 100000
+ encapsulation dot1Q 620
+ ip address 172.16.55.233 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.621
+ description "Graviton_Research_Captial_MUMLS00019"_10-Mar-2018
+ bandwidth 45000
+ encapsulation dot1Q 621
+ ip address 172.16.55.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.627
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00022"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 627
+ ip address 172.16.50.233 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.628
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00023"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 628
+ ip address 172.16.50.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.629
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00024"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 629
+ ip address 172.16.50.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.630
+ description "Open Futures & Commodities Pvt Ltd_MUMLS00025"_01-Jan-2020
+ bandwidth 45000
+ encapsulation dot1Q 630
+ ip address 172.16.51.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/4.698
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/5
+ description ***TTSL-ELAN Links***
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/5.801
+ description "ChoiceEquityBroking_2201830307"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 801
+ ip address 172.16.53.201 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.802
+ description "ChoiceEquityBroking_2201829701"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 802
+ ip address 172.16.53.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.803
+ description "AnugrahStock&Broking_220629179"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 803
+ ip address 172.16.54.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.804
+ description "GEPL_Commodities_PvtLtd_2201834792"_23-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 804
+ ip address 172.16.54.209 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.805
+ description "ADROITCOMMODITIES_SERVICES_2201835875"_23-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 805
+ ip address 172.16.54.225 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.806
+ description "ADROITCOMMODITIES_SERVICES_PvtLtd_3304835876"_23-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 806
+ ip address 172.16.54.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.807
+ description "ADROITCOMMODITIES_SERVICES_PvtLtd_3304835878"_23-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 807
+ ip address 172.16.55.41 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.808
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/5.810
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/5.811
+ description "APT_Commodities_1102836799"_13-Apr-2019
+ bandwidth 2000
+ encapsulation dot1Q 811
+ ip address 172.16.58.89 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.812
+ description "K.R.Choksey Commodity Brokers Private Limited_2201839191"_11-May-2019
+ bandwidth 2000
+ encapsulation dot1Q 812
+ ip address 172.16.58.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.813
+ description "Abans Broking Services _2201793814"_10-May-2019
+ bandwidth 2000
+ encapsulation dot1Q 813
+ ip address 172.16.58.169 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.814
+ description "Abans Broking Services _2201793762"_10-May-2019
+ bandwidth 2000
+ encapsulation dot1Q 814
+ ip address 172.16.58.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.815
+ description "Abans Broking Services _2201793798"_23-May-2019
+ bandwidth 2000
+ encapsulation dot1Q 815
+ ip address 172.16.56.73 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.816
+ description "Inventure commodities Limited_2201840970"_31-May-2019
+ bandwidth 2000
+ encapsulation dot1Q 816
+ ip address 172.16.56.217 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.817
+ description "KIFS Commodities_2201848057"_ 07-Sep-2019
+ bandwidth 20000
+ encapsulation dot1Q 817
+ ip address 172.16.50.73 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 20MBPS_MEMBER_IN
+ service-policy output 20MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/5.837
+ description "Silver Stream Equities Pvt.Ltd _2201852760"_10-Nov-2019
+ bandwidth 2000
+ encapsulation dot1Q 837
+ ip address 172.16.55.201 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6
+ description "Videocon_MPLS_TP_THIRD_UPLINK"
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/6.501
+ description "Raghunandan_667002"_29-Jun-2019
+ bandwidth 100000
+ encapsulation dot1Q 501
+ ip address 172.16.52.225 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6.503
+ description "Rajesh Baheti_667005"_03-Sep-2016
+ bandwidth 100000
+ encapsulation dot1Q 503
+ ip address 172.16.52.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6.507
+ description "Raghunandan_668520"_10-Sep-2016
+ bandwidth 100000
+ encapsulation dot1Q 507
+ ip address 172.16.53.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6.512
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/6.527
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/6.534
+ description "East India_726472"_27-May-2017
+ bandwidth 100000
+ encapsulation dot1Q 534
+ ip address 172.16.54.129 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6.544
+ description "SRD Commodities_818112"_28-Oct-2017
+ bandwidth 100000
+ encapsulation dot1Q 544
+ ip address 172.16.55.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6.549
+ description "KTD Trading_823196"_14-Mar-2018
+ bandwidth 100000
+ encapsulation dot1Q 549
+ ip address 172.16.56.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6.555
+ description "ShareIndiaSecLtd_SNG1819000090015"_18-Aug-2018
+ bandwidth 100000
+ encapsulation dot1Q 555
+ ip address 172.16.56.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/6.556
+ description "ShareIndiaSecLtd_SNG1819000090016"_18-Aug-2018
+ bandwidth 100000
+ encapsulation dot1Q 556
+ ip address 172.16.56.145 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/7
+ description "Microscan_MPLS_TP_Fourth_Uplink"
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/2/7.622
+ description "Asankya-Trading-PVTLTD_MUMLS00094"_14-Sep-2019
+ bandwidth 45000
+ encapsulation dot1Q 622
+ ip address 172.16.50.89 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/7.637
+ description "GogiaCapitalServicesLTD_MUMLS00104"_29-Nov-2019
+ bandwidth 45000
+ encapsulation dot1Q 637
+ ip address 172.16.59.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/7.638
+ description "GogiaCapitalServicesLTD_MUMLS00105"_29-Nov-2019
+ bandwidth 45000
+ encapsulation dot1Q 638
+ ip address 172.16.59.65 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/2/7.639
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/2/7.640
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0
+ description TCL_10 Mbps_091MUMB2131012258836
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/3/0.306
+ description "DynamicCommodities_091KOLK11143033600572"_15-Jun-2019
+ bandwidth 2000
+ encapsulation dot1Q 306
+ ip address 172.16.59.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.307
+ description "LFS Broking Pvt Ltd _091MUMB1143034074721"_03-Sep-2019
+ bandwidth 10000
+ encapsulation dot1Q 307
+ ip address 172.16.56.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.310
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.311
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.312
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.315
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.316
+ description MarketPlaceTechnologies_091MUMB1143034307436_7-Dec-2019
+ bandwidth 2000
+ encapsulation dot1Q 316
+ ip address 172.16.52.129 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.317
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.323
+ description "Ariston_091MUMB1143012715252"_01-Aug-2015
+ bandwidth 10000
+ encapsulation dot1Q 323
+ ip address 172.16.50.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 20MBPS_MEMBER_IN
+ service-policy output 20MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.326
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.327
+ description "Purvang_091MUMB1143012793212"_07-Aug-2015
+ bandwidth 10000
+ encapsulation dot1Q 327
+ ip address 172.16.50.225 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.328
+ description "Jaypee Capital Services Limited_091MUMB1258015520965"_27-Oct-2018
+ bandwidth 2000
+ encapsulation dot1Q 328
+ ip address 172.16.57.65 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.341
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.343
+ description "Ariston_091MUMB1143013761180"_28-Nov-2015
+ bandwidth 10000
+ encapsulation dot1Q 343
+ ip address 172.16.51.145 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 20MBPS_MEMBER_IN
+ service-policy output 20MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.345
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.347
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.351
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.378
+ description "EC commodities Pvt.Ltd_091MUMB1143033351275_23-Apr-2019
+ bandwidth 2000
+ encapsulation dot1Q 378
+ ip address 172.16.58.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.379
+ description "Findoc_Commodities_091MUMB1143033323885"_13-Apr-2019
+ bandwidth 10000
+ encapsulation dot1Q 379
+ ip address 172.16.58.97 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.384
+ description "AdroitCommodities_091MUMB1143033243689"_16-Mar-2019
+ bandwidth 10000
+ encapsulation dot1Q 384
+ ip address 172.16.52.73 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.385
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/0.387
+ description "Maverirck_ShareBrokerPvtLtd_091MUMB1143033528793"_01-Jun-2019
+ bandwidth 10000
+ encapsulation dot1Q 387
+ ip address 172.16.55.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.391
+ description "SiddarthaCommodity_Pvt_Ltd_091MUMB1143033624269_792907"_29-Jun-2019
+ bandwidth 10000
+ encapsulation dot1Q 391
+ ip address 172.16.52.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.394
+ description "PURVAG_COMMODITIES_091MUMB1143029304125_09-Sep-2017
+ bandwidth 10000
+ encapsulation dot1Q 394
+ ip address 172.16.55.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/0.397
+ description "Alice Blue commodities Pvt Ltd_091MUMB1143029497547"_14-Oct-2017
+ bandwidth 10000
+ encapsulation dot1Q 397
+ ip address 172.16.55.97 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1
+ description "Videocon_MPLS_TP_Second_Uplink"
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/3/1.504
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/1.505
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/1.511
+ description "SMC Comtrade_679056"_05-Nov-2016
+ bandwidth 45000
+ encapsulation dot1Q 511
+ ip address 172.16.53.73 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.520
+ description "Adroit_685744"_19-Nov-2016
+ bandwidth 45000
+ encapsulation dot1Q 520
+ ip address 172.16.53.153 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.521
+ description "Adroit_685756"_19-Nov-2016
+ bandwidth 45000
+ encapsulation dot1Q 521
+ ip address 172.16.53.161 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.526
+ description "Purvag_699538"_07-Jan-2016
+ bandwidth 45000
+ encapsulation dot1Q 526
+ ip address 172.16.53.217 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.533
+ description "Purvag_743596"_15-Apr-2017
+ bandwidth 45000
+ encapsulation dot1Q 533
+ ip address 172.16.54.105 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.538
+ description "Findoc_762716"_24-Jun-2017
+ bandwidth 45000
+ encapsulation dot1Q 538
+ ip address 172.16.54.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.539
+ description "Vedika_Vanijya_Private_LTD-770814"-15-Jul-2017
+ bandwidth 45000
+ encapsulation dot1Q 539
+ ip address 172.16.54.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.550
+ description "Rangoli_Trade_823223"_31-Mar-2018
+ bandwidth 10000
+ encapsulation dot1Q 550
+ ip address 172.16.56.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.554
+ description "A. G. Shares_SNG1819000090000"
+ bandwidth 10000
+ encapsulation dot1Q 554
+ ip address 172.16.50.41 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.557
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/1.558
+ description "VT_Commodities_SNG1819000090017"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 558
+ ip address 172.16.51.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.559
+ description "Ariston_Commodities_SNG1819000090001"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 559
+ ip address 172.16.52.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.560
+ description "Ariston_Commodities_SNG1819000090002"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 560
+ ip address 172.16.52.121 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.561
+ description "Ariston_Commodities_SNG1819000090003"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 561
+ ip address 172.16.52.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.562
+ description "Ariston_Commodities_SNG1819000090004"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 562
+ ip address 172.16.52.145 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.563
+ description "Ariston_Commodities_SNG1819000090005"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 563
+ ip address 172.16.52.153 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.564
+ description "Ariston_Commodities_SNG1819000090006"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 564
+ ip address 172.16.52.169 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.565
+ description "Ariston_Commodities_SNG1819000090007"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 565
+ ip address 172.16.52.161 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.566
+ description "Ariston_Commodities_SNG1819000090008"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 566
+ ip address 172.16.52.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.567
+ description "Ariston_Commodities_SNG1819000090009"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 567
+ ip address 172.16.52.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.568
+ description "Ariston_Commodities_SNG1819000090010"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 568
+ ip address 172.16.52.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.569
+ description "Ariston_Commodities_SNG1819000090011"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 569
+ ip address 172.16.52.201 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.570
+ description "Ariston_Commodities_SNG1819000090012"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 570
+ ip address 172.16.52.209 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.571
+ description "Ariston_Commodities_SNG1819000090013"_25-Aug-2018
+ bandwidth 2000
+ encapsulation dot1Q 571
+ ip address 172.16.52.217 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.572
+ description "GoyalSecurities_SNG1819000090019"_22-Sep-2018
+ bandwidth 45000
+ encapsulation dot1Q 572
+ ip address 172.16.56.209 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.573
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/1.574
+ description "Achintya_SNG1819000090030"_26-Jan-2019
+ bandwidth 10000
+ encapsulation dot1Q 574
+ ip address 172.16.52.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.575
+ description "Marwadi Shares & Finance Ltd_SNG1819000090031"_15-Feb-2020
+ bandwidth 45000
+ encapsulation dot1Q 575
+ ip address 172.16.53.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.576
+ description "Marwadi Shares & Finance Ltd_SNG1819000090032"_15-Feb-2020
+ bandwidth 45000
+ encapsulation dot1Q 576
+ ip address 172.16.53.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.577
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/1.578
+ description "AryaTradex-SNG1819000090035"_16-Mar-2019
+ bandwidth 100000
+ encapsulation dot1Q 578
+ ip address 172.16.51.137 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.580
+ description "ANGCOMMODITIES-PVT-LTD _SNG1819000090042"_10-Aug-2019
+ bandwidth 45000
+ encapsulation dot1Q 580
+ ip address 172.16.59.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.582
+ description "Gogia Capital Services Ltd._SNG1819000090044"_12-Oct-2019
+ bandwidth 45000
+ encapsulation dot1Q 582
+ ip address 172.16.56.225 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.583
+ description "Master Commodity Services LTD-SNG1819000090045"_25-Jan-2020
+ bandwidth 100000
+ encapsulation dot1Q 583
+ ip address 172.16.51.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/1.599
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/2
+ description ***Airtel--10MB links***
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ speed 1000
+ no negotiation auto
+!
+interface GigabitEthernet0/3/2.401
+ description "AchintyaCommodities_6913528"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 401
+ ip address 172.16.51.153 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.402
+ description "DOTEX_CKT ID"_27-May-2017
+ bandwidth 9000
+ encapsulation dot1Q 402
+ ip address 172.16.54.145 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.403
+ description "IIFLSecurities-CKT"_20-Oct-2018
+ bandwidth 2000
+ encapsulation dot1Q 403
+ ip address 172.16.57.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.405
+ description "RajeshBaheti_12339711_27-Oct-2018
+ bandwidth 2000
+ encapsulation dot1Q 405
+ ip address 172.16.57.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.408
+ description "LFS Broking_13215018"_17-Aug-2019
+ bandwidth 10000
+ encapsulation dot1Q 408
+ ip address 172.16.59.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.409
+ description "Parshwanath_Commodity_3201015"_14-Sep-2019
+ bandwidth 2000
+ encapsulation dot1Q 409
+ ip address 172.16.50.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.410
+ description "Ambalal Share & Stock PVT LTD-13269336"_25-Jan-2020
+ bandwidth 2000
+ encapsulation dot1Q 410
+ ip address 172.16.58.161 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.411
+ description "Marketplace Tech Infra_CKT ID Pending"_18-May-2019
+ bandwidth 2000
+ encapsulation dot1Q 411
+ ip address 172.16.58.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.415
+ description "B.N.Rathi_10694205"_26-AUG-2017
+ bandwidth 10000
+ encapsulation dot1Q 415
+ ip address 172.16.54.233 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.416
+ description "Navia_commodities_10694206"_26-AUG-2017
+ bandwidth 9000
+ encapsulation dot1Q 416
+ ip address 172.16.54.217 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.419
+ description "Alice Blue commodities Pvt Ltd_091MUMB1143029497547"_14-Oct-2017
+ bandwidth 10000
+ encapsulation dot1Q 419
+ ip address 172.16.55.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.422
+ description "ChoiceEquity_2786525"_08-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 422
+ ip address 172.16.56.161 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.423
+ description "Adroit_Commdities_12279034"_22-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 423
+ ip address 172.16.56.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.425
+ description "SMC_Comtrade_1070318"_01-Sep-2018
+ bandwidth 1544
+ encapsulation dot1Q 425
+ ip address 172.16.50.169 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.426
+ description "Adroit_Commodties_10638803"_29-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 426
+ ip address 172.16.56.153 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.432
+ description "MotilalOswalSecurities_3000007574"_24-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 432
+ ip address 172.16.57.201 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.433
+ description "Way2WealthCommodities_12343403"_03-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 433
+ ip address 172.16.57.97 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.436
+ description "Narnolia_LTD_10646687"_12-Jun-2019
+ bandwidth 2000
+ encapsulation dot1Q 436
+ ip address 172.16.57.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.437
+ description "GogiaCaptialServicesLTD_13076863"_20-Apr-2019
+ bandwidth 2000
+ encapsulation dot1Q 437
+ ip address 172.16.58.121 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.439
+ description "Aasmaas_Securities_8998335"_15-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 439
+ ip address 172.16.58.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.441
+ description "MoneyLiciousSecurities_2916857"_29-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 441
+ ip address 172.16.52.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.445
+ description "PinnacleForex & Securities Pvt Ltd_2976389"_4-Jan-2020
+ bandwidth 2000
+ encapsulation dot1Q 445
+ ip address 172.16.54.121 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.454
+ description "Globe_Commodities_13064066"_27-Jul-2019
+ bandwidth 100000
+ encapsulation dot1Q 454
+ ip address 172.16.55.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.455
+ description "AdroitCommodities_11002204"_15-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 455
+ ip address 172.16.56.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.456
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/2.458
+ description "MasterCommodity_3000076391"_27-Oct-2018
+ bandwidth 2000
+ encapsulation dot1Q 458
+ ip address 172.16.57.73 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.460
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/2.461
+ description "Chaitanya_commodity_12732922"_04-Feb-2019
+ bandwidth 2000
+ encapsulation dot1Q 461
+ ip address 172.16.53.129 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.474
+ description "Shri Parasram Commodities_RA2858880"_12-Jan-2019
+ bandwidth 2000
+ encapsulation dot1Q 474
+ ip address 172.16.52.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.476
+ description "AdityaBirla_8745126"_10-Nov-2018
+ bandwidth 2000
+ encapsulation dot1Q 476
+ ip address 172.16.57.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.477
+ description "GSV Securities_13220253"_17-Aug-2019
+ bandwidth 2000
+ encapsulation dot1Q 477
+ ip address 172.16.59.41 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.480
+ description "HDFCSecurities_10694205"_17-Nov-2018
+ bandwidth 10000
+ encapsulation dot1Q 480
+ ip address 172.16.57.129 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.481
+ description "RiddhiSiddhi_bullion_11041863"_19-Jan-2019
+ bandwidth 2000
+ encapsulation dot1Q 481
+ ip address 172.16.51.241 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.482
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/2.483
+ description "PhilipCaptialIndiaLtd-10997086"_22-Sep-2018
+ bandwidth 2000
+ encapsulation dot1Q 483
+ ip address 172.16.56.201 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.484
+ description "GlobeCommodities_10605776"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 484
+ ip address 172.16.54.201 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.488
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/2.489
+ description "GlobeCapital_12653959_29-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 489
+ ip address 172.16.51.209 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.490
+ description "Vijeta_Multicommodities_pvt._Ltd.l_13217602"_03-Aug-2019
+ bandwidth 10000
+ encapsulation dot1Q 490
+ ip address 172.16.59.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.491
+ description "Greshma_10994139"_15-Dec-2018
+ bandwidth 2000
+ encapsulation dot1Q 491
+ ip address 172.16.57.225 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/2.495
+ description "WealthCreationCommoditiesPvtLtd_13094306"_27-Apr-2019
+ bandwidth 2000
+ encapsulation dot1Q 495
+ ip address 172.16.58.146 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3
+ description "Videocon_MPLS_TP_First_Uplink"
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/3/3.502
+ description "RajeshBaheti_667003"_03-Sep-2016
+ bandwidth 45000
+ encapsulation dot1Q 502
+ ip address 172.16.52.233 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.503
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/3.507
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/3.508
+ description "Way2Wealth_668971"_17-Sep-2016
+ bandwidth 45000
+ encapsulation dot1Q 508
+ ip address 172.16.53.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.509
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/3.510
+ description "East India_674856"_01-Oct-2016
+ bandwidth 45000
+ encapsulation dot1Q 510
+ ip address 172.16.53.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.512
+ description "SMC Global Securities Ltd_679079_05-Nov-2019"
+ bandwidth 100000
+ encapsulation dot1Q 512
+ ip address 172.16.53.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.515
+ description " Way2wealth_683266"_05-Nov-2016
+ bandwidth 45000
+ encapsulation dot1Q 515
+ ip address 172.16.53.121 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.516
+ description "Quadeye_684076"_05-Nov-2016
+ bandwidth 100000
+ encapsulation dot1Q 516
+ ip address 172.16.53.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.517
+ description "Quadeye_684075"_05-Nov-2016
+ bandwidth 100000
+ encapsulation dot1Q 517
+ ip address 172.16.53.105 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.528
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/3.531
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/3.535
+ description "APTCommodities_756730"_03-Jun-2017
+ bandwidth 45000
+ encapsulation dot1Q 535
+ ip address 172.16.54.153 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.536
+ description "APTCommodities_758547"_03-Jun-2017
+ bandwidth 45000
+ encapsulation dot1Q 536
+ ip address 172.16.54.161 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.540
+ description "East_India-804050"_16-Sep-2017
+ bandwidth 45000
+ encapsulation dot1Q 540
+ ip address 172.16.55.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.541
+ description "SRD Commodities_807412"_30-Sep-2017
+ bandwidth 10000
+ encapsulation dot1Q 541
+ ip address 172.16.55.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.546
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/3.548
+ description "KTD Trading_823195"_14-Mar-2018
+ bandwidth 45000
+ encapsulation dot1Q 548
+ ip address 172.16.55.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.551
+ description "Plus Wealth_95042"_12-May-2018
+ bandwidth 45000
+ encapsulation dot1Q 551
+ ip address 172.16.56.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.552
+ description "Plus Wealth_95050"_12-May-2018
+ bandwidth 45000
+ encapsulation dot1Q 552
+ ip address 172.16.56.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.577
+ description "AryaTradex-SNG1819000090034"_16-Mar-2019
+ bandwidth 100000
+ encapsulation dot1Q 577
+ ip address 172.16.51.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.579
+ description "Railtrade Stock Broking_SNG1819000090041"_22-Jul-2019
+ bandwidth 10000
+ encapsulation dot1Q 579
+ ip address 172.16.55.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 10MBPS_MEMBER_IN
+ service-policy output 10MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/3.581
+ description "Bagaria_Derivatives_SNG1819000090043"_24-Aug-2019
+ bandwidth 2000
+ encapsulation dot1Q 581
+ ip address 172.16.56.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4
+ description ***MTNL--ELAN links***
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/3/4.704
+ description "AdityaCorperation-3100007078"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 704
+ ip address 172.16.52.65 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.705
+ description "Gayatri B Agrawal-3100014760"_26-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 705
+ ip address 172.16.55.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.706
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/4.707
+ description "KR_Choksy_Commodity_Broker _PVT_LTD-3200005148"_23-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 707
+ ip address 172.16.58.25 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.709
+ description "AdvantageCommodities_3200012628"_09-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 709
+ ip address 172.16.50.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.710
+ description "BNRATHI_3200013073"_09-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 710
+ ip address 172.16.51.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.713
+ description "MehtaCommoditiesPvtLtd_3400005427"_09-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 713
+ ip address 172.16.51.73 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.714
+ description "Nirman Commodities_3400003524"_18-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 714
+ ip address 172.16.55.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.715
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/4.716
+ description "Comfort Commodities_3400005353"_09-Apr-2019
+ bandwidth 2000
+ encapsulation dot1Q 716
+ ip address 172.16.58.81 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.717
+ description "BDShahCommodities_3400005377"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 717
+ ip address 172.16.51.185 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.718
+ description "Pragaya_Securities_3400005379"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 718
+ ip address 172.16.51.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.720
+ description "PROFITMART-3400005390"_09-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 720
+ ip address 172.16.51.89 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.721
+ description "Reliance_Commodities_Limited_3400006676"_16-Apr-2019
+ bandwidth 2000
+ encapsulation dot1Q 721
+ ip address 172.16.58.113 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.722
+ description "BPCOMTRADE_3400005432"_09-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 722
+ ip address 172.16.51.97 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.723
+ description "SatcoCaptialMarketLtd_3400005427"_09-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 723
+ ip address 172.16.51.65 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.724
+ description "KIFSCommodities_3400005434"_28-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 724
+ ip address 172.16.58.41 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.725
+ description "MaganumFincom_3400005428_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 725
+ ip address 172.16.52.49 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.726
+ description "Amrutleela_Commodities_3400005431"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 726
+ ip address 172.16.51.233 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.727
+ description "LFC_Securities_3400005430"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 727
+ ip address 172.16.51.177 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.729
+ description "Anugraha_3400005480"_16-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 729
+ ip address 172.16.51.161 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.730
+ description "RKSV_CommoditiesIndia_3400005533"_23-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 730
+ ip address 172.16.58.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.731
+ description "India Advantage_M2-DRP-175571-ADVK"_05-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 731
+ ip address 172.16.58.17 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.732
+ description "ALPHACOMMODITY_3400005732"_09-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 732
+ ip address 172.16.51.105 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.734
+ description "DealmoneyCommodities_3400006454"_26-Mar-2019
+ bandwidth 2000
+ encapsulation dot1Q 734
+ ip address 172.16.53.193 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.735
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ punt-control enable 500
+!
+interface GigabitEthernet0/3/4.736
+ description "IIFL_Securities_3400006839"_13-Apr-2019
+ bandwidth 2000
+ encapsulation dot1Q 736
+ ip address 172.16.58.105 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.737
+ description "NOCTESTLink_3100010148"_28-May-2019
+ bandwidth 2000
+ encapsulation dot1Q 737
+ ip address 172.16.52.97 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.738
+ description "LakshmiShreeInvestment& Securities Ltd_3400008198"_01-Jun-2019
+ bandwidth 2000
+ encapsulation dot1Q 738
+ ip address 172.16.58.201 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.739
+ description "JMFinancailCommtradeLTD_3400008318"_22-Jun-2019
+ bandwidth 2000
+ encapsulation dot1Q 739
+ ip address 172.16.53.209 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.740
+ description "LFS Broking Pvt.Ltd_3400008572"_15-Jul-2019
+ bandwidth 2000
+ encapsulation dot1Q 740
+ ip address 172.16.53.57 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/4.741
+ description "Shikago_Trade_Pvt.Ltd_3400008617"_27-Jul-2019
+ bandwidth 2000
+ encapsulation dot1Q 741
+ ip address 172.16.59.9 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 2MBPS_MEMBER_IN
+ service-policy output 2MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/5
+ description ****Tikona Links****
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+interface GigabitEthernet0/3/5.901
+ description "Raghunandan Industries_7000020042"_29-Feb-2020
+ bandwidth 100000
+ encapsulation dot1Q 901
+ ip address 172.16.53.33 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/5.902
+ description "Raghunandan Industries_7000020043"_29-Feb-2020
+ bandwidth 100000
+ encapsulation dot1Q 902
+ ip address 172.16.54.89 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/5.903
+ description "SMC Global Securities Limited_7000020104"_14-Mar-2020
+ bandwidth 100000
+ encapsulation dot1Q 903
+ ip address 172.16.52.249 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 100MBPS_MEMBER_IN
+ service-policy output 100MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/5.904
+ description "SMC Global Securities Limited_7000020105"_14-Mar-2020
+ bandwidth 45000
+ encapsulation dot1Q 904
+ ip address 172.16.53.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim dr-priority 10
+ ip pim sparse-mode
+ punt-control enable 500
+ bfd template BFD_BGP
+ service-policy input 45MBPS_MEMBER_IN
+ service-policy output 45MBPS_MEMBER_OUT
+!
+interface GigabitEthernet0/3/6
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/3/7
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0
+ vrf forwarding Mgmt-intf
+ ip address 192.168.3.201 255.255.255.0
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ negotiation auto
+!
+!
+router eigrp 100
+ network 192.168.192.72 0.0.0.3
+ network 192.168.192.80 0.0.0.3
+ redistribute eigrp 320 metric 50000 1 255 1 1500 route-map EIGRP320->100
+ redistribute bgp 64515 metric 50000 1 255 1 1500 route-map BGP->EIGRP100
+ passive-interface GigabitEthernet0/3/5.902
+ passive-interface GigabitEthernet0/3/5.901
+ eigrp router-id 172.16.100.51
+ nsf
+!
+!
+router eigrp 320
+ distribute-list route-map EXCHANGE-LAN->OUT out 
+ distribute-list route-map MEMBER-LAN-IN in 
+ network 172.16.0.0
+ redistribute connected metric 50000 1 255 1 1500 route-map RP->WAN
+ redistribute eigrp 100 metric 50000 1 255 1 1500 route-map EIGRP100->320
+ passive-interface GigabitEthernet0/2/4.629
+ passive-interface GigabitEthernet0/3/3.510
+ passive-interface GigabitEthernet0/2/3.622
+ passive-interface GigabitEthernet0/2/3.617
+ passive-interface GigabitEthernet0/2/3.623
+ passive-interface GigabitEthernet0/2/3.624
+ passive-interface GigabitEthernet0/2/3.635
+ passive-interface GigabitEthernet0/2/3.636
+ passive-interface GigabitEthernet0/2/3.637
+ passive-interface GigabitEthernet0/2/3.638
+ passive-interface GigabitEthernet0/2/4.620
+ passive-interface GigabitEthernet0/2/4.621
+ passive-interface GigabitEthernet0/2/4.601
+ passive-interface GigabitEthernet0/2/4.606
+ passive-interface GigabitEthernet0/2/3.607
+ passive-interface GigabitEthernet0/2/3.608
+ passive-interface GigabitEthernet0/2/3.609
+ passive-interface GigabitEthernet0/2/3.610
+ passive-interface GigabitEthernet0/2/3.611
+ passive-interface GigabitEthernet0/2/3.625
+ passive-interface GigabitEthernet0/2/3.626
+ passive-interface GigabitEthernet0/2/4.628
+ passive-interface GigabitEthernet0/2/4.630
+ passive-interface GigabitEthernet0/2/3.631
+ passive-interface GigabitEthernet0/2/3.632
+ passive-interface GigabitEthernet0/3/3.535
+ passive-interface GigabitEthernet0/3/3.536
+ passive-interface GigabitEthernet0/3/3.540
+ passive-interface GigabitEthernet0/3/3.517
+ passive-interface GigabitEthernet0/3/3.516
+ passive-interface GigabitEthernet0/3/3.507
+ passive-interface GigabitEthernet0/3/3.503
+ passive-interface GigabitEthernet0/3/3.502
+ passive-interface GigabitEthernet0/3/3.541
+ passive-interface GigabitEthernet0/3/3.508
+ passive-interface GigabitEthernet0/3/3.509
+ passive-interface GigabitEthernet0/3/3.515
+ passive-interface GigabitEthernet0/3/3.531
+ passive-interface GigabitEthernet0/3/3.546
+ passive-interface GigabitEthernet0/2/3.634
+ passive-interface GigabitEthernet0/3/3.548
+ passive-interface GigabitEthernet0/2/4.602
+ passive-interface GigabitEthernet0/2/4.603
+ passive-interface GigabitEthernet0/2/4.604
+ passive-interface GigabitEthernet0/2/4.605
+ passive-interface GigabitEthernet0/2/4.627
+ passive-interface GigabitEthernet0/3/1.520
+ passive-interface GigabitEthernet0/3/1.521
+ passive-interface GigabitEthernet0/3/1.550
+ passive-interface GigabitEthernet0/3/1.533
+ passive-interface GigabitEthernet0/3/1.526
+ passive-interface GigabitEthernet0/3/1.505
+ passive-interface GigabitEthernet0/3/1.504
+ passive-interface GigabitEthernet0/3/1.539
+ passive-interface GigabitEthernet0/3/1.557
+ passive-interface GigabitEthernet0/3/1.558
+ passive-interface GigabitEthernet0/3/1.559
+ passive-interface GigabitEthernet0/3/1.560
+ passive-interface GigabitEthernet0/3/1.561
+ passive-interface GigabitEthernet0/3/1.562
+ passive-interface GigabitEthernet0/3/1.563
+ passive-interface GigabitEthernet0/3/1.564
+ passive-interface GigabitEthernet0/3/1.565
+ passive-interface GigabitEthernet0/3/1.566
+ passive-interface GigabitEthernet0/3/1.567
+ passive-interface GigabitEthernet0/3/1.568
+ passive-interface GigabitEthernet0/3/1.569
+ passive-interface GigabitEthernet0/3/1.570
+ passive-interface GigabitEthernet0/3/1.571
+ passive-interface GigabitEthernet0/3/1.554
+ passive-interface GigabitEthernet0/3/1.572
+ passive-interface GigabitEthernet0/2/2.639
+ passive-interface GigabitEthernet0/2/2.640
+ passive-interface GigabitEthernet0/2/2.644
+ passive-interface GigabitEthernet0/3/1.538
+ passive-interface GigabitEthernet0/2/4.612
+ passive-interface GigabitEthernet0/2/4.613
+ passive-interface GigabitEthernet0/2/2.641
+ passive-interface GigabitEthernet0/2/2.642
+ passive-interface GigabitEthernet0/2/2.643
+ passive-interface GigabitEthernet0/2/2.645
+ passive-interface GigabitEthernet0/2/0.320
+ passive-interface GigabitEthernet0/2/0.321
+ passive-interface GigabitEthernet0/3/0.328
+ passive-interface GigabitEthernet0/3/2.458
+ passive-interface GigabitEthernet0/3/2.405
+ passive-interface GigabitEthernet0/3/2.433
+ passive-interface GigabitEthernet0/2/0.329
+ passive-interface GigabitEthernet0/3/2.476
+ passive-interface GigabitEthernet0/3/2.480
+ passive-interface GigabitEthernet0/2/0.353
+ passive-interface GigabitEthernet0/2/0.346
+ passive-interface GigabitEthernet0/2/0.334
+ passive-interface GigabitEthernet0/2/0.355
+ passive-interface GigabitEthernet0/2/0.314
+ passive-interface GigabitEthernet0/3/1.573
+ passive-interface GigabitEthernet0/3/2.491
+ passive-interface GigabitEthernet0/2/0.339
+ passive-interface GigabitEthernet0/2/0.341
+ passive-interface GigabitEthernet0/2/0.345
+ passive-interface GigabitEthernet0/2/0.357
+ passive-interface GigabitEthernet0/3/2.489
+ passive-interface GigabitEthernet0/3/2.441
+ passive-interface GigabitEthernet0/3/2.460
+ passive-interface GigabitEthernet0/2/0.358
+ passive-interface GigabitEthernet0/2/0.363
+ passive-interface GigabitEthernet0/3/1.575
+ passive-interface GigabitEthernet0/3/1.576
+ passive-interface GigabitEthernet0/2/0.368
+ passive-interface GigabitEthernet0/2/0.381
+ passive-interface GigabitEthernet0/2/4.698
+ passive-interface GigabitEthernet0/3/1.599
+ passive-interface GigabitEthernet0/3/1.577
+ passive-interface GigabitEthernet0/3/1.578
+ passive-interface GigabitEthernet0/3/2.401
+ passive-interface GigabitEthernet0/3/0.384
+ passive-interface GigabitEthernet0/3/2.484
+ passive-interface GigabitEthernet0/3/4.732
+ passive-interface GigabitEthernet0/3/4.704
+ passive-interface GigabitEthernet0/3/4.709
+ passive-interface GigabitEthernet0/3/4.717
+ passive-interface GigabitEthernet0/3/4.718
+ passive-interface GigabitEthernet0/3/4.722
+ passive-interface GigabitEthernet0/3/4.723
+ passive-interface GigabitEthernet0/3/4.725
+ passive-interface GigabitEthernet0/3/4.726
+ passive-interface GigabitEthernet0/3/4.727
+ passive-interface GigabitEthernet0/3/4.729
+ passive-interface GigabitEthernet0/3/4.731
+ passive-interface GigabitEthernet0/3/4.730
+ passive-interface GigabitEthernet0/3/4.715
+ passive-interface GigabitEthernet0/2/5.808
+ passive-interface GigabitEthernet0/3/2.482
+ passive-interface GigabitEthernet0/3/2.422
+ passive-interface GigabitEthernet0/2/5.802
+ passive-interface GigabitEthernet0/3/0.379
+ passive-interface GigabitEthernet0/2/5.811
+ passive-interface GigabitEthernet0/3/4.736
+ passive-interface GigabitEthernet0/2/5.812
+ passive-interface GigabitEthernet0/3/4.707
+ passive-interface GigabitEthernet0/2/2.616
+ passive-interface GigabitEthernet0/2/6.501
+ passive-interface GigabitEthernet0/2/6.549
+ passive-interface GigabitEthernet0/3/2.454
+ passive-interface GigabitEthernet0/2/6.503
+ passive-interface GigabitEthernet0/2/6.544
+ passive-interface GigabitEthernet0/2/6.555
+ passive-interface GigabitEthernet0/2/6.556
+ passive-interface GigabitEthernet0/3/3.551
+ passive-interface GigabitEthernet0/3/3.552
+ passive-interface GigabitEthernet0/2/2.646
+ passive-interface GigabitEthernet0/2/2.647
+ passive-interface GigabitEthernet0/3/2.483
+ passive-interface GigabitEthernet0/3/3.528
+ passive-interface GigabitEthernet0/2/6.527
+ passive-interface GigabitEthernet0/2/6.534
+ passive-interface GigabitEthernet0/2/0.359
+ passive-interface GigabitEthernet0/2/0.336
+ passive-interface GigabitEthernet0/2/5.837
+ passive-interface GigabitEthernet0/3/1.580
+ passive-interface GigabitEthernet0/3/1.574
+ passive-interface GigabitEthernet0/3/4.720
+ passive-interface GigabitEthernet0/3/4.738
+ passive-interface GigabitEthernet0/2/6.512
+ passive-interface GigabitEthernet0/3/1.511
+ passive-interface GigabitEthernet0/2/7.622
+ passive-interface GigabitEthernet0/2/2.618
+ passive-interface GigabitEthernet0/2/7.638
+ passive-interface GigabitEthernet0/2/7.637
+ passive-interface GigabitEthernet0/3/1.582
+ passive-interface GigabitEthernet0/3/4.710
+ passive-interface GigabitEthernet0/3/4.716
+ passive-interface GigabitEthernet0/3/4.714
+ passive-interface GigabitEthernet0/3/4.740
+ passive-interface GigabitEthernet0/3/4.713
+ passive-interface GigabitEthernet0/3/4.741
+ passive-interface GigabitEthernet0/3/4.739
+ passive-interface GigabitEthernet0/3/3.579
+ passive-interface GigabitEthernet0/3/3.581
+ passive-interface GigabitEthernet0/3/4.737
+ passive-interface GigabitEthernet0/3/3.512
+ passive-interface GigabitEthernet0/3/4.734
+ passive-interface GigabitEthernet0/3/4.721
+ passive-interface GigabitEthernet0/3/2.455
+ passive-interface GigabitEthernet0/3/2.423
+ passive-interface GigabitEthernet0/2/0.398
+ passive-interface GigabitEthernet0/3/2.416
+ passive-interface GigabitEthernet0/3/2.456
+ passive-interface GigabitEthernet0/3/2.410
+ passive-interface GigabitEthernet0/3/1.583
+ passive-interface GigabitEthernet0/2/7.639
+ passive-interface GigabitEthernet0/2/7.640
+ passive-interface GigabitEthernet0/3/5.904
+ passive-interface GigabitEthernet0/3/5.903
+ eigrp router-id 172.16.100.52
+ nsf
+!
+router bgp 64515
+ bgp router-id 172.16.100.52
+ bgp log-neighbor-changes
+ bgp listen range 172.16.0.0/16 peer-group MEMBER-NEIGHBOR
+ bgp listen limit 500
+ bgp graceful-restart
+ neighbor MEMBER-NEIGHBOR peer-group
+ neighbor MEMBER-NEIGHBOR remote-as 64520
+ neighbor MEMBER-NEIGHBOR password 7 <removed>
+ neighbor MEMBER-NEIGHBOR fall-over bfd single-hop
+ !
+ address-family ipv4
+  network 10.138.7.23 mask 255.255.255.255
+  redistribute eigrp 100 metric 100 route-map EIGRP100->BGP
+  neighbor MEMBER-NEIGHBOR activate
+  neighbor MEMBER-NEIGHBOR send-community
+  neighbor MEMBER-NEIGHBOR soft-reconfiguration inbound
+  neighbor MEMBER-NEIGHBOR route-map MEMBER-LAN-BGP-IN in
+  neighbor MEMBER-NEIGHBOR route-map EXCHANGE-LAN-BGP-OUT out
+  neighbor MEMBER-NEIGHBOR maximum-prefix 2 warning-only
+ exit-address-family
+!
+ip forward-protocol nd
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip route vrf Mgmt-intf 172.26.1.101 255.255.255.255 192.168.3.31
+ip route vrf Mgmt-intf 172.26.1.111 255.255.255.255 192.168.3.31
+ip route vrf Mgmt-intf 172.26.1.115 255.255.255.255 192.168.3.31
+ip route vrf Mgmt-intf 172.26.1.120 255.255.255.255 192.168.3.31 name Auto_Backup
+ip route vrf Mgmt-intf 192.168.210.0 255.255.255.0 192.168.3.1 name SOC
+ip route vrf Mgmt-intf 192.168.225.0 255.255.255.0 192.168.3.1 name SOC-PAM
+ip pim rp-address 10.136.7.23 PROD-MCAST
+ip pim allow-rp rp-list MEM-RP group-list PROD-MCAST
+!
+ip bgp-community new-format
+ip ssh time-out 60
+ip ssh version 2
+ip ssh server algorithm mac hmac-sha1
+ip ssh client algorithm mac hmac-sha1
+!
+!
+ip prefix-list EXCHANGE-LAN seq 5 permit 10.138.7.20/30 le 32
+ip prefix-list EXCHANGE-LAN seq 10 permit 10.136.7.20/30 le 32
+ip prefix-list EXCHANGE-LAN seq 15 permit 192.168.13.0/24 le 32
+ip prefix-list EXCHANGE-LAN seq 20 permit 172.26.1.111/32
+!
+ip prefix-list EXCHANGE-LAN-BGP-OUT seq 5 permit 10.138.7.20/30 le 32
+ip prefix-list EXCHANGE-LAN-BGP-OUT seq 10 permit 10.136.7.20/30 le 32
+ip prefix-list EXCHANGE-LAN-BGP-OUT seq 15 permit 192.168.13.0/24 le 32
+ip prefix-list EXCHANGE-LAN-BGP-OUT seq 20 permit 172.26.1.111/32
+!
+ip prefix-list EXCHANGE-LAN-EIGRP-BGP seq 5 permit 10.138.7.20/30 le 32
+ip prefix-list EXCHANGE-LAN-EIGRP-BGP seq 10 permit 10.136.7.20/30 le 32
+ip prefix-list EXCHANGE-LAN-EIGRP-BGP seq 15 permit 192.168.13.0/24 le 32
+ip prefix-list EXCHANGE-LAN-EIGRP-BGP seq 20 permit 172.26.1.111/32
+!
+ip prefix-list MEMBER-LAN seq 5 deny 10.138.7.20/30 le 32
+ip prefix-list MEMBER-LAN seq 10 deny 10.136.7.20/30 le 32
+ip prefix-list MEMBER-LAN seq 15 deny 192.168.13.0/24 le 32
+ip prefix-list MEMBER-LAN seq 20 permit 10.105.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 25 permit 10.185.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 30 permit 10.175.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 35 permit 10.160.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 40 permit 10.100.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 45 permit 10.101.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 50 permit 10.102.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 55 permit 10.103.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 60 permit 10.104.0.0/16 le 28
+ip prefix-list MEMBER-LAN seq 65 permit 10.106.0.0/16 le 28
+!
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 5 deny 10.138.7.20/30 le 32
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 10 deny 10.136.7.20/30 le 32
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 15 deny 192.168.13.0/24 le 32
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 20 permit 10.105.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 25 permit 10.185.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 30 permit 10.175.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 35 permit 10.160.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 40 permit 10.100.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 45 permit 10.101.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 50 permit 10.102.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 55 permit 10.103.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 60 permit 10.104.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-EIGRP seq 65 permit 10.106.0.0/16 le 28
+!
+ip prefix-list MEMBER-LAN-BGP-IN seq 5 permit 10.105.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 10 permit 10.185.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 15 permit 10.175.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 20 permit 10.160.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 25 permit 10.100.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 30 permit 10.101.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 35 permit 10.102.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 40 permit 10.103.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 45 permit 10.104.0.0/16 le 28
+ip prefix-list MEMBER-LAN-BGP-IN seq 50 permit 10.106.0.0/16 le 28
+!
+ip access-list standard CA-NMS-Read-write-Access
+ permit 192.168.13.13
+ permit 172.26.1.102
+ permit 172.26.1.101
+ip access-list standard MEM-RP
+ permit 10.138.7.23
+ip access-list standard PROD-MCAST
+ permit 239.255.255.255
+ permit 235.255.255.255
+ permit 234.255.255.255
+ permit 239.255.60.12
+ permit 239.255.60.13
+ permit 239.255.60.14
+ permit 239.255.60.15
+ permit 239.255.60.10
+ permit 239.255.60.11
+ permit 239.255.60.16
+ permit 239.255.60.17
+ permit 239.255.60.18
+ permit 224.0.1.129
+ip access-list standard telnet-access
+ permit 192.168.3.55
+ permit 192.168.3.53
+ permit 192.168.3.52
+ permit 192.168.3.12
+ permit 192.168.13.13
+ permit 192.168.3.30
+ permit 192.168.13.30
+ permit 172.26.1.120
+ permit 192.168.192.73
+ permit 192.168.192.81
+!
+ip access-list extended LAN-IN
+ permit icmp host 192.168.192.73 any
+ permit icmp host 192.168.192.81 any
+ permit eigrp host 192.168.192.73 any
+ permit eigrp host 192.168.192.81 any
+ permit pim host 192.168.192.73 any
+ permit pim host 192.168.192.81 any
+ permit udp host 192.168.13.7 host 239.255.255.255 eq 4013
+ permit udp host 192.168.13.8 host 235.255.255.255 eq 24113
+ permit udp host 192.168.13.111 host 239.255.60.10 eq 24115
+ permit udp host 192.168.13.111 host 239.255.60.11 eq 24116
+ permit udp host 192.168.13.111 host 239.255.60.12 eq 24117
+ permit udp host 192.168.13.111 host 239.255.60.13 eq 24118
+ permit udp host 192.168.13.111 host 239.255.60.14 eq 24119
+ permit udp host 192.168.13.111 host 239.255.60.15 eq 24120
+ permit udp host 192.168.13.111 host 239.255.60.16 eq 24121
+ permit udp host 192.168.13.111 host 239.255.60.17 eq 24122
+ permit udp host 192.168.13.111 host 239.255.60.18 eq 24123
+ permit tcp host 192.168.13.5 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.112 eq 9692 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.9 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.14 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.32 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.37 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.42 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.33 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.44 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.46 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.47 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.48 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.6 eq 9999 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.20 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.36 eq 443 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.36 eq 990 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.36 range 50001 50100 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.13 10.0.0.0 0.255.255.255 eq 22
+ permit udp host 192.168.13.13 10.0.0.0 0.255.255.255 eq snmp
+ permit tcp host 192.168.13.30 10.0.0.0 0.255.255.255 eq 22
+ permit tcp host 192.168.13.30 10.0.0.0 0.255.255.255 eq telnet
+ permit icmp 192.168.13.0 0.0.0.255 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.11 eq 9511 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.72 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.74 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.56 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.57 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.58 eq 7777 10.0.0.0 0.255.255.255
+ permit tcp host 192.168.13.68 eq 7777 10.0.0.0 0.255.255.255
+ permit udp host 192.168.13.49 host 234.255.255.255 eq 24114
+ permit udp host 192.168.13.13 host 192.168.192.74 eq snmp
+ permit tcp host 192.168.192.73 host 192.168.192.74 eq 22
+ permit tcp host 192.168.192.81 host 192.168.192.82 eq 22
+ permit tcp host 192.168.13.13 host 192.168.192.82 eq 22
+ permit tcp host 192.168.13.13 host 192.168.192.74 eq 22
+ permit tcp host 192.168.13.73 eq 7979 10.0.0.0 0.255.255.255
+ permit udp host 192.168.13.114 host 239.255.60.10 eq 24115
+ permit udp host 192.168.13.114 host 239.255.60.11 eq 24116
+ permit udp host 192.168.13.114 host 239.255.60.12 eq 24117
+ permit udp host 192.168.13.114 host 239.255.60.13 eq 24118
+ permit udp host 192.168.13.114 host 239.255.60.14 eq 24119
+ permit udp host 192.168.13.114 host 239.255.60.15 eq 24120
+ permit udp host 192.168.13.114 host 239.255.60.16 eq 24121
+ permit udp host 192.168.13.114 host 239.255.60.17 eq 24122
+ permit udp host 192.168.13.114 host 239.255.60.18 eq 24123
+ permit tcp host 192.168.13.30 any eq 22
+logging host 192.168.3.119 vrf Mgmt-intf
+logging host 192.168.210.20 vrf Mgmt-intf
+!
+!
+route-map EXCHANGE-LAN->OUT permit 10 
+ match ip address prefix-list EXCHANGE-LAN
+!
+route-map MEMBER-LAN-BGP-IN permit 10 
+ match ip address prefix-list MEMBER-LAN-BGP-IN
+!
+route-map EIGRP100->BGP permit 10 
+ match ip address prefix-list EXCHANGE-LAN-EIGRP-BGP
+!
+route-map BGP->EIGRP100 permit 10 
+ match ip address prefix-list MEMBER-LAN-BGP-EIGRP
+ set tag 64520
+!
+route-map RP->WAN permit 10 
+ match ip address MEM-RP
+!
+route-map MEMBER-LAN-IN permit 10 
+ match ip address prefix-list MEMBER-LAN
+!
+route-map EIGRP320->100 permit 10 
+ match ip address prefix-list MEMBER-LAN
+!
+route-map EIGRP100->320 permit 10 
+ match ip address prefix-list EXCHANGE-LAN
+!
+route-map EXCHANGE-LAN-BGP-OUT permit 10 
+ match ip address prefix-list EXCHANGE-LAN-BGP-OUT
+ set metric 100
+ set community 64515:100
+!
+snmp-server community <removed> RO CA-NMS-Read-write-Access
+snmp-server community <removed> RO CA-NMS-Read-write-Access
+snmp-server host 172.26.1.101 version 2c <removed> 
+snmp-server host 172.26.1.102 version 2c <removed> 
+!
+!
+control-plane
+!
+!
+!
+!
+!
+banner login ^CCC
+************************************************************************
+>>>>>>>>>>>>>>> ATTENTION <<<<<<<<<<<<<<<<
+
+Authorized access only!
+Disconnect IMMEDIATELY if you are not an authorized user!
+
+It is being monitored and events recorded as logs continuously.
+If during the course of monitoring or otherwise, it is found that
+the system is being used by personnel in violation of the provision
+of authority or without authority, it will be deemed unlawful under
+the court of law of Government of India.
+
+In such an event, he or she may be subjected to legal proceedings,
+unilaterally decided by MULTI COMMODITY EXCHANGE OF 
+INDIA LIMITED IT GROUP in the Indian court of Law. 
+The logs generated in such cases, but not limited to, 
+will be used as evidence in the court of law."
+************************************************************************
+^C
+!
+line con 0
+ session-timeout 5 
+ exec-timeout 5 0
+ password 7 <removed>
+ logging synchronous
+ stopbits 1
+line aux 0
+ no exec
+ transport output none
+ stopbits 1
+line vty 0 4
+ session-timeout 5 
+ access-class telnet-access in vrf-also
+ exec-timeout 5 0
+ logging synchronous
+ login local
+ transport input ssh
+!
+ntp allow mode control 3
+ntp server vrf Mgmt-intf 192.168.3.140
+wsma agent exec
+!
+wsma agent config
+!
+wsma agent filesys
+!
+wsma agent notify
+!
+event manager applet punt authorization bypass
+ event syslog pattern ".*punt cause policer drop packet casue 55" maxrun 600
+ action 0.1 syslog msg "Punt policer drops detected, writing data to bootflash:eem-log.txt"
+ action 0.2 cli command "enable"
+ action 0.3 cli command "term exec prompt timestamp"
+ action 0.4 cli command "show clock | append bootflash:eem-log.txt"
+ action 0.5 cli command "show int summary | append bootflash:eem-log.txt"
+ action 0.6 cli command "show proc cpu sort | append bootflash:eem-log.txt"
+ action 0.7 cli command "show platform software infrastructure lsmpi | append bootflash:eem-log.txt"
+ action 0.8 cli command "show platform hardware qfp active datapath utilization summary | append bootflash:eem-log.txt"
+ action 0.9 cli command "show platform hardware qfp active statistics drop | append bootflash:eem-log.txt"
+ action 1.0 cli command "show platform software punt-policer drop-only | append bootflash:eem-log.txt"
+ action 1.1 cli command "show platform hardware qfp active infrastructure punt config cause 55 | append bootflash:eem-log.txt"
+ action 1.2 cli command "show platform hardware qfp active infrastructure punt statistics type punt-drop | append bootflash:eem-log.txt"
+ action 1.3 cli command "show platform hardware qfp active infrastructure punt statistics type inject-drop | append bootflash:eem-log.txt"
+ action 1.4 cli command "show platform hardware qfp active infrastructure punt statistics type global-drop | append bootflash:eem-log.txt"
+ action 1.5 cli command "debug platform packet-trace packet 1024 fia-trace data-size 2048"
+ action 1.6 cli command "debug platform packet-trace copy packet both"
+ action 1.7 cli command "debug platform packet-trace punt code 55"
+ action 1.8 cli command "debug platform packet-trace drop"
+ action 1.9 cli command "debug platform condition ipv4 ingress"
+ action 2.0 cli command "debug platform condition start"
+ action 2.1 wait 60
+ action 2.2 cli command "debug platform condition stop"
+ action 2.3 cli command "show platform packet-trace packet all decode | append bootflash:eem-log.txt"
+ action 2.4 cli command "clear platform condition all"
+ action 2.5 cli command "undebug all"
+ action 2.6 cli command "show log | append bootflash:eem-log.txt"
+ action 2.7 syslog msg "EEM script and FIA trace completed."
+event manager applet punt-interface authorization bypass
+ event syslog pattern " .*PUNT_INJECT-5-DROP_PUNT_INTF: punt interface policer drop packet.*" maxrun 600
+ action 0.1 syslog msg "Punt policer drops detected, writing data to bootflash:eem-log1.txt"
+ action 0.2 cli command "enable"
+ action 0.3 cli command "term exec prompt timestamp"
+ action 0.4 cli command "show clock | append bootflash:eem-log1.txt"
+ action 0.5 cli command "show int summary | append bootflash:eem-log1.txt"
+ action 0.6 cli command "show proc cpu sort | append bootflash:eem-log1.txt"
+ action 0.7 cli command "show platform software infrastructure lsmpi | append bootflash:eem-log1.txt"
+ action 0.8 cli command "show platform hardware qfp active datapath utilization summary | append bootflash:eem-log1.txt"
+ action 0.9 cli command "show platform hardware qfp active statistics drop | append bootflash:eem-log1.txt"
+ action 1.0 cli command "show platform software punt-policer drop-only | append bootflash:eem-log1.txt"
+ action 1.1 cli command "show platform hardware qfp active infrastructure punt config cause 55 | append bootflash:eem-log1.txt"
+ action 1.2 cli command "show platform hardware qfp active infrastructure punt statistics type global-drop | append bootflash:eem-log1.txt"
+ action 1.3 cli command "debug platform packet-trace packet 1024 fia-trace data-size 2048"
+ action 1.4 cli command "debug platform packet-trace copy packet both"
+ action 1.5 cli command "debug platform packet-trace punt"
+ action 1.6 cli command "debug platform packet-trace drop"
+ action 1.7 cli command "debug platform condition ipv4 ingress"
+ action 1.8 cli command "debug platform condition start"
+ action 1.9 wait 10
+ action 2.0 cli command "debug platform condition stop"
+ action 2.1 cli command "show platform packet-trace packet all decode | append bootflash:eem-log1.txt"
+ action 2.2 cli command "clear platform condition all"
+ action 2.3 cli command "undebug all"
+ action 2.4 cli command "show log | append bootflash:eem-log1.txt"
+ action 2.5 syslog msg "EEM script and FIA trace completed."
+!
+end
+
+
